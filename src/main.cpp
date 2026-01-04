@@ -1,8 +1,7 @@
-#include "network.h"
 #include <Arduino.h>
-#include <WiFi.h> // Library for wifi scanning
-#include <vector> 
-#include <algorithm> // For sorting the vector
+#include <WiFi.h> 
+#include "network.h"
+#include "networkScanner.h"
 #define LED_PIN 32
 
 void setup() 
@@ -14,35 +13,19 @@ void setup()
 
 void loop() 
 {
-  int networkCount {WiFi.scanNetworks()}; // Create a network count variable that inits scanNetworks function
-  std::vector<Network> networks;
+  NetworkScanner scanner;
+  scanner.scan();
 
   Serial.print("Found ");
-  Serial.print(networkCount); // Prints out number of networks that were found
+  Serial.print(scanner.getCount()); // Prints out number of networks that were found
   Serial.println(" networks!");
 
-  // Fill the vector using constructor
-  for (int i{}; i < networkCount; i++)
-  {
-    Network net(WiFi.SSID(i), WiFi.RSSI(i), WiFi.channel(i));
-    networks.push_back(net);
-  }
-  
-  // Sort the vector by strongest signal
-  std::sort(networks.begin(), networks.end(), [](const Network& a, const Network& b) {
-    return a.getRssi() > b.getRssi();  // descending order
-  });
-
-  // Print using the class
-  for (int i{0}; i < networkCount; i++)
-  {
-    Serial.print(i + 1);
-    Serial.print(": ");
-    networks[i].print();
-  }
+  scanner.sortBySignal();
+  scanner.printAll();
 
   Serial.println();
   delay(5000);
+
   digitalWrite(LED_PIN, HIGH);
   delay(1000);
   digitalWrite(LED_PIN, LOW);

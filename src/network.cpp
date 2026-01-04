@@ -12,7 +12,7 @@ Network::Network(String ssid, int rssi, int channel)
  * PRINT
  * Outputs info about the network: SSID, RSSI, and Channel
  **************/
-void Network::print()
+void Network::print() const
 {
     Serial.print(ssid);
     Serial.print(" (");

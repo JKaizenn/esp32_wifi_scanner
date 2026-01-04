@@ -7,7 +7,7 @@ class Network
 {
 public:
     Network(String ssid, int rssi, int channel);
-    void print();
+    void print()  const;
     int getRssi() const;
 
 private:
