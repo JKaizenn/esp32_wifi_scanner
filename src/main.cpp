@@ -2,18 +2,18 @@
 #include <WiFi.h> 
 #include "network.h"
 #include "networkScanner.h"
-#define LED_PIN 32
+#include "led.h"
 
 void setup() 
 {
   Serial.begin(115200);      // Inits Serial Monitor with a communication speed (baud rate)
   WiFi.mode(WIFI_STA);       // Sets device wifi mode to STA (Station Mode) which connects to other networks
-  pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() 
 {
   NetworkScanner scanner;
+  static Led statusLed(32);
   scanner.scan();
 
   Serial.print("Found ");
@@ -25,9 +25,5 @@ void loop()
 
   Serial.println();
   delay(5000);
-
-  digitalWrite(LED_PIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
-  delay(1000);
+  statusLed.blink(1000);
 }
