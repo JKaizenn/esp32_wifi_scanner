@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <WiFi.h> 
 #include "networkScanner.h"
-#include "led.h"
 #include "wifiManager.h"
 
 void setup() 
@@ -46,7 +45,6 @@ void setup()
 void loop() 
 {
     static NetworkScanner scanner;
-    static Led statusLed(32);
     
     // Scan for networks
     scanner.scan();
@@ -61,5 +59,4 @@ void loop()
     
     Serial.println();
     delay(5000);
-    statusLed.blink(1000);
 }
