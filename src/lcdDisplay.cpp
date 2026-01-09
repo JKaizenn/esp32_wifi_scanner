@@ -28,5 +28,13 @@ void LcdDisplay::setBrightness(int level) {
  **************/
 void LcdDisplay::checkButton()
 {
-    
+    bool currentState {digitalRead(BUTTON_PIN)}; // Set current state to BUTTON_PIN output
+    if (currentState == LOW && lastButtonState == HIGH)
+    {
+        delay(50);                                            // Debounce (wait for button to settle)
+        brightnessIndex = (brightnessIndex + 1) % NUM_LEVELS; // Cycle 0-1-2-3-4-0
+        setBrightness(BRIGHTNESS_LEVELS[brightnessIndex]);    // Apply new level
+    }
+
+    lastButtonState = currentState; 
 }

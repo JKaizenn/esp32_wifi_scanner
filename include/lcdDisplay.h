@@ -33,6 +33,5 @@ private:
     // Brightness levels
     static constexpr int BRIGHTNESS_LEVELS[] = {255, 191, 127, 64, 0};
     static constexpr int NUM_LEVELS = 5;
-
 };
 #endif
