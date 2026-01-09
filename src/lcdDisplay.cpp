@@ -1,12 +1,12 @@
 #include "lcdDisplay.h"
 
 /**************
- *DEFAULT CONSTRUCTOR
+ * DEFAULT CONSTRUCTOR
  **************/
 LcdDisplay::LcdDisplay() : brightnessIndex(0), lastButtonState(HIGH) { }
 
 /**************
- *BEGIN
+ * BEGIN
  **************/
 void LcdDisplay::begin()
 {
@@ -17,14 +17,14 @@ void LcdDisplay::begin()
 }
 
 /**************
- *SET BRIGHTNESS
+ * SET BRIGHTNESS
  **************/
 void LcdDisplay::setBrightness(int level) {
     analogWrite(BACKLIGHT_PIN, level);
 }
 
 /**************
- *CHECK BUTTON
+ * CHECK BUTTON
  **************/
 void LcdDisplay::checkButton()
 {
@@ -38,3 +38,36 @@ void LcdDisplay::checkButton()
 
     lastButtonState = currentState; 
 }
+
+/**************
+ * PRINT
+ **************/
+void LcdDisplay::print(const String& text)
+{
+    lcd.print(text);
+}
+
+/**************
+ * PRINT LINE
+ * Set Cursor to row, clear it, then print
+ **************/
+void LcdDisplay::printLine(int row, const String& text)
+{
+    lcd.setCursor(0, row);          // Column 0, row 0 or 1
+    lcd.print("                ");  // Clear row (16 spaces)
+    lcd.setCursor(0, row);          // Clear row (16 spaces)
+    lcd.print(text);
+}
+
+/**************
+ * CLEAR
+ **************/
+void LcdDisplay::clear()
+{
+    lcd.clear(); // Clears the lcd screen
+}
+
+/**************
+ * BRIGHTNESS LEVELS
+ **************/
+const int LcdDisplay::BRIGHTNESS_LEVELS[5] = {255, 191, 127, 64, 0};
