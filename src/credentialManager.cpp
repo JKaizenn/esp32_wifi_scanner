@@ -1,4 +1,5 @@
 #include "credentialManager.h"
+#include <nvs_flash.h>
 
 /**************
  * DEFAULT CONSTRUCTOR

@@ -1,47 +1,77 @@
 #include <Arduino.h>
 #include <WiFi.h> 
+#include <nvs_flash.h>
 #include "networkScanner.h"
 #include "wifiManager.h"
 #include "lcdDisplay.h"
+#include "credentialManager.h"
 
 LcdDisplay display;
+CredentialManager* credentials;
 
 void setup() 
 {
+    nvs_flash_init();
+    credentials = new CredentialManager();
+
+    Serial.begin(115200);
+    delay(1000);
+    
     display.begin();
     display.printLine(0, "WiFi Scanner");
-    display.printLine(1, "Press Enter...");
-    Serial.begin(115200);
-    
-    // Wait for user to be ready
-    Serial.println("Press Enter to start...");
-    while (!Serial.available()) { display.checkButton(); }
-    Serial.readStringUntil('\n');
+    display.printLine(1, "Starting...");
     
     WiFi.mode(WIFI_STA);
     
-    // Keep trying until connected
+    String ssid;
+    String password;
+    
+    Serial.println("Checking for saved credentials...");
+    
+    if (credentials->hasCredentials())
+    {
+        Serial.println("Found saved credentials!");
+        
+        ssid = credentials->getSsid();
+        password = credentials->getPassword();
+        
+        Serial.print("SSID: ");
+        Serial.println(ssid);
+        
+        display.printLine(0, "Found saved");
+        display.printLine(1, "credentials!");
+        delay(1000);
+        
+        display.printLine(0, "Connecting...");
+        display.printLine(1, ssid);
+        
+        WifiManager wifi(ssid, password);
+        wifi.connect();
+    }
+    else
+    {
+        Serial.println("No saved credentials found.");
+    }
+    
     while (!WiFi.isConnected())
     {
-        // Get SSID from user
         display.printLine(0, "Enter SSID:");
         display.printLine(1, "See Serial...");
         Serial.println("Enter SSID:");
         while (!Serial.available()) { display.checkButton(); }
-        String ssid = Serial.readStringUntil('\n');
+        ssid = Serial.readStringUntil('\n');
         ssid.trim();
         
-        // Get password from user
         display.printLine(0, "Enter Password:");
         display.printLine(1, "See Serial...");
         Serial.println("Enter Password:");
         while (!Serial.available()) { display.checkButton(); }
-        String password = Serial.readStringUntil('\n');
+        password = Serial.readStringUntil('\n');
         password.trim();
         
-        // Try to connect
         display.printLine(0, "Connecting...");
         display.printLine(1, ssid);
+        
         WifiManager wifi(ssid, password);
         wifi.connect();
         
@@ -52,10 +82,12 @@ void setup()
             Serial.println("Try again...\n");
         }
     }
-
-    // Show success
+    
+    credentials->save(ssid, password);
+    Serial.println("Credentials saved to flash!");
+    
     display.printLine(0, "Connected!");
-    display.printLine(1, WiFi.localIP().toString());    
+    display.printLine(1, WiFi.localIP().toString());
     Serial.println("Ready!\n");
 }
 
@@ -64,7 +96,6 @@ void loop()
     display.checkButton();  
     static NetworkScanner scanner;
     
-    // Scan for networks
     scanner.scan();
     
     display.printLine(0, "Networks: " + String(scanner.getCount()));
@@ -74,7 +105,6 @@ void loop()
     Serial.print(scanner.getCount());
     Serial.println(" networks!");
     
-    // Sort and display results
     scanner.sortBySignal();
     scanner.printAll();
     
